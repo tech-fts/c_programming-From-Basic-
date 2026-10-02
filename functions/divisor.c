@@ -1,6 +1,6 @@
 #include <stdio.h>
 
-void gcd(int u, int v)
+int gcd(int u, int v)
 {
 	int temp;
 
@@ -14,12 +14,20 @@ void gcd(int u, int v)
 	}
 
 	printf("%i\n", u);
+	return u;
 }
 
 int main(void){
-	gcd(150, 35);
-	gcd(1026, 405);
-	gcd(83, 240);
+	int result;
+
+	result = gcd(150, 35);
+	printf("The gcd of 150 and 35 is %i\n", result);
+
+	result = gcd(1026, 405);
+	printf("The gcd of 1026 and 405 is %i\n", result);
+
+	printf("The gcd of 83 and 240 id %i\n", gcd(83, 240));
+
 
 	return 0;
 }
