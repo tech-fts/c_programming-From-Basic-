@@ -8,16 +8,23 @@ int main()
 	{
 		ratingCounter[i] = 0;
 	}
+
 	printf("Enter your response\n");
 
-	for( i =1; i <= 20; ++i)
+	while(1)
 	{
 		scanf("%i", &response);
-		if (response < 1 || response > 10)
+
+		if(response >= 999)
+		{
+			break;
+		}
+
+		if(response < 1 || response > 10 )
 		{
 			printf("Bad response: %i\n", response);
 		}else{
-			++ratingCounter[response];
+			ratingCounter[response];
 		}
 	}
 
