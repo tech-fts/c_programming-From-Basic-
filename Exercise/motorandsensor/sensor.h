@@ -1,5 +1,5 @@
 #ifndef SENSOR_H
-#ifdef SENSOR_H
+#define SENSOR_H
 
 typedef enum {
 	Sensor_Encoder,
@@ -7,10 +7,10 @@ typedef enum {
 } SensorType;
 
 typedef struct{
-	SensorType type,
-	int pin_id,
-	float raw_data,
-	float filter_data
+	SensorType type;
+	int pin_id;
+	float raw_data;
+	float filter_data;
 }Sensor;
 
 void sensor_init(Sensor* s, SensorType type, int pin);
