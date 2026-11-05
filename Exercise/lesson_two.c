@@ -19,10 +19,15 @@ void add_all_contact(struct contact list[], int index)
 	scanf("%s", list[index].email);
 
 	printf("Enter phone number: ");
-	scanf("%i", list[index].phone_number);
+	if (scanf("%d", &list[index].phone_number) != 1) {
+		printf("Invalid phone number; enter digits only.\n");
+		return;
+	}
 
 	printf("Enter address: ");
 	scanf("%s", list[index].address);
+
+	printf("address is %s", list[index].address);
 	
 }
 
@@ -51,10 +56,9 @@ int main (void)
 	scanf("%i", &option);
 
 	if (option == 1){
-		add_all_contact(contact_list, count_list);
+		add_all_contact(contact_list, count_list - 1);
 	}
 	else if (option == 2){
 		view_contact_list(contact_list, count_list);
 	}
 }
-
