@@ -1,5 +1,4 @@
 #include <stdio.h>
-#include <string.h>
 
 #define MAX_list 5
 
@@ -14,16 +13,24 @@ void add_shooping_list(struct shopping list, struct shopping buy_list[], int lis
         printf("Shopping list is empty.\n");
         return;
     }
-    printf("Enter name: ");
-    scanf("%s", list.name);
 
-    printf("Enter count for item: ");
-    scanf("%i", &list.count);
+    int count = 0;
 
-    printf("Enter price for item: ");
-    scanf("%.1f", &list.price);
+    while (count < list_count ){
+        printf("Enter name: ");
+        scanf("%s", list.name);
 
-    printf("name of the item is %s. cout of the item is %i. price of the item is %.1f ", list.name, list.count, list.price);
+        printf("Enter count for item: ");
+        scanf("%i", &list.count);
+
+        printf("Enter price for item: ");
+        scanf("%f", &list.price);
+
+        printf("name of the item is %s. count of the item is %i. price of the item is %.1f. \n", list.name, list.count, list.price);
+        buy_list[count] = list;
+        count++;
+    }
+
 }
 
 int main(void){
