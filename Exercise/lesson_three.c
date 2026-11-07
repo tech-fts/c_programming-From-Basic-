@@ -59,7 +59,13 @@ void search_by_index(struct shopping buy_list[], int list_count){
         return;
     }
 
-    printf("name of the item is %s. count of the item is %i. price of the item is %.1f. \n", buy_list[index].name, buy_list[index].count, buy_list[index].price);
+    //printf("name of the item is %s. count of the item is %i. price of the item is %.1f. \n", buy_list[index].name, buy_list[index].count, buy_list[index].price);
+
+    for (int i = 0; i < list_count; i++){
+        if (i == index){
+            printf("name of the item is %s. count of the item is %i. price of the item is %.1f. \n", buy_list[i].name, buy_list[i].count, buy_list[i].price);
+        }
+    }
 }
 
 int main(void){
