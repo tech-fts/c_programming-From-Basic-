@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <time.h>
 #include <string.h>
+#include <stdlib.h>
 
 /*
 expese_tracker
@@ -43,10 +44,11 @@ void get_current_time(expense_tracker *tracker)
 
 void create_expense_tracker(expense_tracker tracker, expense_tracker usage_list[], int list_count){
 
-    if(list_count == 0){
+    if(usage_list == NULL){
         printf("There is no list count to insert data!!");
         return;
     }
+
     int i = 0;
     while(i < list_count){
         printf("Enter name for your expense: ");
@@ -62,12 +64,14 @@ void create_expense_tracker(expense_tracker tracker, expense_tracker usage_list[
         usage_list[i] = tracker;
         i++;
     }
+    
 
 }
 
 void view_expense_tracker(expense_tracker usage_list[], int list_count){
-    if (list_count == 0){
-        printf("There is no view for list");
+
+    if(usage_list == NULL){
+        printf("There is no list count to view data!!");
         return;
     }
 
@@ -109,17 +113,19 @@ int main (void)
     printf("Enter count to access the array: ");
     scanf("%i", &list_count);
 
-    expense_tracker usage_list[list_count];
+    expense_tracker *expense_list = (expense_tracker *)malloc(sizeof(expense_tracker) * list_count);
+
+    // I create memory manage using c expense_tracker usage_list[list_count];
 
     for(;;){
         int user_choose = choose_option();
         switch(user_choose){
             case 1:
-                create_expense_tracker(usage, usage_list, list_count);
+                create_expense_tracker(usage, expense_list, list_count);
                 break;
             
             case 2:
-                view_expense_tracker(usage_list, list_count);
+                view_expense_tracker(expense_list, list_count);
                 break;
 
             case 4:
