@@ -37,10 +37,7 @@ void get_current_time(expense_tracker *tracker)
     struct tm *created = localtime(&current_time);
 
     strftime(
-        tracker->created_time,
-        sizeof(tracker->created_time),
-        "%d-%m-%Y %H:%M:%S",
-        created
+        tracker->created_time,sizeof(tracker->created_time),"%d-%m-%Y %H:%M:%S",created
     );
 }
 
