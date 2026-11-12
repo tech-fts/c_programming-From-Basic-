@@ -13,8 +13,7 @@ int main(void)
     int init_capacity = 2;
     int i = 0;
 
-    struct TemperatureTracker *tracker =
-        malloc(init_capacity * sizeof(struct TemperatureTracker));
+    struct TemperatureTracker *tracker = malloc(init_capacity * sizeof(struct TemperatureTracker));
 
     if (tracker == NULL)
     {
@@ -64,8 +63,7 @@ int main(void)
             tracker = temp;
             init_capacity = new_capacity_total;
 
-            printf("Memory reallocation successful. New capacity: %d\n",
-                   init_capacity);
+            printf("Memory reallocation successful. New capacity: %d\n",init_capacity);
         }
 
         printf("\nEnter Temperature (float): ");
@@ -81,14 +79,16 @@ int main(void)
     }
 
     printf("\n--- Temperature Records ---\n");
-
+    float total_temperature = 0.0;
     for (int j = 0; j < i; j++)
     {
-        printf("%.2f %c - %s\n",
-               tracker[j].temperature,
-               tracker[j].unit,
-               tracker[j].date);
+        total_temperature += tracker[j].temperature;
+        printf("%.2f %c - %s\n",tracker[j].temperature,tracker[j].unit,tracker[j].date);
+
+
     }
+
+    printf("Average Temperature: %.2f\n", total_temperature / i);
 
     free(tracker);
     tracker = NULL;
