@@ -44,8 +44,7 @@ int main(void)
             }
 
             printf("Enter additional capacity: ");
-            if (scanf("%d", &new_capacity) != 1 ||
-                new_capacity <= 0) {
+            if (scanf("%d", &new_capacity) != 1 || new_capacity <= 0) {
                 printf("Invalid capacity!\n");
                 free(std_list);
                 return 1;
@@ -84,34 +83,83 @@ int main(void)
         i++;
     }
 
-    // Display student records
-    printf("\n===== Student Records =====\n");
+    printf("\n===== Avrage marks for students =====\n");
 
-    float total_marks = 0;
-    int highest_index = 0;
+    float total_marks , average_mark;
 
-    for (int j = 0; j < i; j++) {
+    for(int j = 0; j < i; j++){
         printf("\nName: %s", std_list[j].name);
         printf("\nAge: %d", std_list[j].age);
         printf("\nMarks: %.2f\n", std_list[j].marks);
 
         total_marks += std_list[j].marks;
+    }
 
-        if (std_list[j].marks >
-            std_list[highest_index].marks) {
-            highest_index = j;
+    printf("\n====== Average Marks for each student ======\n");
+
+    average_mark = total_marks/init_capacity;
+    printf("Average mark is: %.2f\n", average_mark);
+
+    float highest_mark = std_list[0].marks;
+    float lowest_mark = std_list[0].marks;
+    
+    for(int j = 0; j < i; j++){
+        if (std_list[j].marks > highest_mark){
+            highest_mark = std_list[j].marks;
+        }
+
+        if (std_list[j].marks < lowest_mark){
+            lowest_mark = std_list[j].marks;
         }
     }
 
-    if (i > 0) {
-        printf("\nAverage Marks: %.2f\n", total_marks / i);
+    printf("Highest marks is : %.2f\n", highest_mark);
+    printf("Lowest marks is : %.2f\n", lowest_mark);
 
-        printf("Highest Marks: %s (%.2f)\n",
-               std_list[highest_index].name,
-               std_list[highest_index].marks);
-    } else {
-        printf("\nNo student records entered.\n");
+    printf("\n====== Collect lowest and highest mark ======\n");
+
+    int lowest_count , highest_count = 0;
+    for(int j = 0; j < i; j++){
+        if (std_list[j].marks < 40){
+            lowest_count += 1;
+        }
+
+        if (std_list[j].marks > 40){
+            highest_count += 1;
+        }
     }
+
+    printf("Highest marks student is: %d\n", highest_count);
+    printf("Lowest marks student is: %d\n", lowest_count);
+
+    // // Display student records
+    // printf("\n===== Student Records =====\n");
+
+    // float total_marks = 0;
+    // int highest_index = 0;
+
+    // for (int j = 0; j < i; j++) {
+    //     printf("\nName: %s", std_list[j].name);
+    //     printf("\nAge: %d", std_list[j].age);
+    //     printf("\nMarks: %.2f\n", std_list[j].marks);
+
+    //     total_marks += std_list[j].marks;
+
+    //     if (std_list[j].marks >
+    //         std_list[highest_index].marks) {
+    //         highest_index = j;
+    //     }
+    // }
+
+    // if (i > 0) {
+    //     printf("\nAverage Marks: %.2f\n", total_marks / i);
+
+    //     printf("Highest Marks: %s (%.2f)\n",
+    //            std_list[highest_index].name,
+    //            std_list[highest_index].marks);
+    // } else {
+    //     printf("\nNo student records entered.\n");
+    // }
 
     free(std_list);
     std_list = NULL;
