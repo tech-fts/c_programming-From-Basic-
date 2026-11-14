@@ -97,7 +97,7 @@ int main(void)
 
     printf("\n====== Average Marks for each student ======\n");
 
-    average_mark = total_marks/init_capacity;
+    average_mark = total_marks/i;
     printf("Average mark is: %.2f\n", average_mark);
 
     float highest_mark = std_list[0].marks;
@@ -118,19 +118,26 @@ int main(void)
 
     printf("\n====== Collect lowest and highest mark ======\n");
 
-    int lowest_count , highest_count = 0;
+    int lowest_count , highest_count = 0 , pass_count, failed_count;
     for(int j = 0; j < i; j++){
         if (std_list[j].marks < 40){
             lowest_count += 1;
+            failed_count += 1;
         }
 
         if (std_list[j].marks > 40){
             highest_count += 1;
+            pass_count += 1;
         }
     }
 
     printf("Highest marks student is: %d\n", highest_count);
     printf("Lowest marks student is: %d\n", lowest_count);
+
+    printf("\n====== passed students and failed students ======\n");
+
+    printf("Passed students are: %d\n",pass_count );
+    printf("Failed students are: %d\n", failed_count);
 
     // // Display student records
     // printf("\n===== Student Records =====\n");
