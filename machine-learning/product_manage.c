@@ -11,18 +11,193 @@ struct Product {
     int min_stock;
 };
 
-int user_option(){
-    int opt ;
+int user_option(void) {
+    int opt;
 
-    printf(" 0. Exit\n 1. add product\n 2. Disaply product\n 3. Search product\n 4. Update product:\n Enter your choice: ");
+    printf("0. Exit\n");
+    printf("1. Add product\n");
+    printf("2. Display product\n");
+    printf("3. Search product\n");
+    printf("4. Update product\n");
+    printf("Enter your choice: ");
+
     scanf("%d", &opt);
 
     return opt;
 }
 
+
+void update_product(struct Product **pdlist, int *count) {
+
+    if (pdlist == NULL || *pdlist == NULL || *count == 0) {
+        printf("No products available to update!\n");
+        return;
+    }
+
+    int found_index = -1;
+    char search_name[100];
+    char update_option[50];
+
+    printf("\n====== Update Product ======\n");
+
+    // Clear leftover newline before fgets
+    int ch;
+    while ((ch = getchar()) != '\n' && ch != EOF);
+
+    printf("Enter name to search product for update: ");
+    fgets(search_name, sizeof(search_name), stdin);
+
+    search_name[strcspn(search_name, "\n")] = '\0';
+
+    // Search product
+    for (int i = 0; i < *count; i++) {
+
+        if (strcmp((*pdlist)[i].name, search_name) == 0) {
+            found_index = i;
+            break;
+        }
+    }
+
+    // Check product found
+    if (found_index == -1) {
+        printf("Product not found!\n");
+        return;
+    }
+
+    // Display product
+    printf("\nProduct found!\n");
+
+    printf("%-10s %-20s %-15s %-12s %-10s %-10s\n",
+           "ID", "Name", "Category", "Price", "Stock", "Min Stock");
+
+    printf("%-10s %-20s %-15s %-12.2f %-10d %-10d\n",
+           (*pdlist)[found_index].id,
+           (*pdlist)[found_index].name,
+           (*pdlist)[found_index].category,
+           (*pdlist)[found_index].unit_price,
+           (*pdlist)[found_index].stock,
+           (*pdlist)[found_index].min_stock);
+
+    // Select update field
+    printf("\nWhich field do you want to update?\n");
+    printf("1. name\n");
+    printf("2. category\n");
+    printf("3. unit_price\n");
+    printf("4. stock\n");
+    printf("5. min_stock\n");
+    printf("Enter field name: ");
+
+    scanf("%49s", update_option);
+
+    // Update selected field
+    if (strcmp(update_option, "name") == 0) {
+
+        printf("Enter new name: ");
+        scanf(" %99[^\n]", (*pdlist)[found_index].name);
+
+    } else if (strcmp(update_option, "category") == 0) {
+
+        printf("Enter new category: ");
+        scanf("%49s", (*pdlist)[found_index].category);
+
+    } else if (strcmp(update_option, "unit_price") == 0) {
+
+        printf("Enter new price: ");
+        scanf("%f", &(*pdlist)[found_index].unit_price);
+
+    } else if (strcmp(update_option, "stock") == 0) {
+
+        printf("Enter new stock: ");
+        scanf("%d", &(*pdlist)[found_index].stock);
+
+    } else if (strcmp(update_option, "min_stock") == 0) {
+
+        printf("Enter new min stock: ");
+        scanf("%d", &(*pdlist)[found_index].min_stock);
+
+    } else {
+
+        printf("Invalid update option!\n");
+        return;
+    }
+
+    printf("\nProduct updated successfully!\n");
+}
+
+
+void search_product(struct Product **pdlist, int *count) {
+    if (pdlist == NULL || *pdlist == NULL || *count == 0) {
+        printf("No products available to search!\n");
+        return;
+    }
+
+    int found = 0;
+    char search_name[100];
+
+    printf("\n====== Search Product by Name ======\n");
+    printf("Enter product name: ");
+    scanf("%99s", search_name);
+
+    printf("%-10s %-20s %-15s %-12s %-10s %-10s\n",
+           "ID", "Name", "Category", "Price", "Stock", "Min Stock");
+
+    for (int i = 0; i < *count; i++) {
+
+        if (strcmp((*pdlist)[i].name, search_name) == 0) {
+
+            printf("%-10s %-20s %-15s %-12.2f %-10d %-10d\n",
+                   (*pdlist)[i].id,
+                   (*pdlist)[i].name,
+                   (*pdlist)[i].category,
+                   (*pdlist)[i].unit_price,
+                   (*pdlist)[i].stock,
+                   (*pdlist)[i].min_stock);
+
+            found = 1;
+        }
+    }
+
+    if (found == 0) {
+        printf("Product not found!\n");
+    }
+}
+
+int create_category(struct Product **pdlist, int *count, char *current_category)
+{
+    int categoryOpt;
+
+    printf("Enter same category: 1\n");
+    printf("Enter different category: 2\n");
+    printf("Enter your choice: ");
+    scanf("%d", &categoryOpt);
+
+    switch(categoryOpt)
+    {
+        case 1:
+            printf("Enter category: ");
+            scanf("%49s", current_category);
+
+            strcpy((*pdlist)[*count].category, current_category);
+
+            return 1;
+
+        case 2:
+            printf("Enter category: ");
+            scanf("%49s", (*pdlist)[*count].category);
+
+            return 0;
+
+        default:
+            printf("Invalid category option!\n");
+            return -1;
+    }
+}
+
 void add_product(struct Product **pdlist, int *init_count, int *count){
     printf("\n\n ====== Adding Product List ======\n\n");
-    
+    int same_category = 0, sameCategoryCount = 0;
+    char current_category[50] = "";
+
     while(1) {
         if(*count == *init_count){
             printf("Memory is full...\n");
@@ -50,15 +225,18 @@ void add_product(struct Product **pdlist, int *init_count, int *count){
 
             int index = *count;
 
-            struct Product *temp = realloc(*pdlist, total_capacity * sizeof(struct Product));
+            struct Product *temp = realloc(*pdlist,total_capacity * sizeof(struct Product));
+
+            if (temp == NULL) {
+                printf("Memory reallocation failed!\n");
+                return;
+            }
 
             *pdlist = temp;
-
             *init_count = total_capacity;
-            *count = total_capacity;
 
         }
-        snprintf((*pdlist)[*count].id,sizeof((*pdlist)[*count].id),"P%03d", count + 1);
+        snprintf((*pdlist)[*count].id,sizeof((*pdlist)[*count].id),"P%03d", *count + 1);
 
         printf("Enter Name: ");
         getchar();
@@ -67,8 +245,22 @@ void add_product(struct Product **pdlist, int *init_count, int *count){
 
         (*pdlist)[*count].name[strcspn((*pdlist)[*count].name, "\n")] = '\0';
 
-        printf("Enter category: ");
-        scanf("%49s", (*pdlist)[*count].category);
+        if (same_category == 0)
+        {
+            printf("\n===== Enter category (using one category or change category) =====\n");
+
+            int result = create_category(pdlist, count, current_category);
+
+            if (result == -1) {
+                continue;
+            }
+
+            same_category = result;
+        }
+        else
+        {
+            strcpy((*pdlist)[*count].category, current_category);
+        }
 
         printf("Enter unit price: ");
         scanf("%f", &(*pdlist)[*count].unit_price);
@@ -121,6 +313,14 @@ void user_action(int opt, struct Product **pdlist, int capacity, int *count)
     
     case 2:
         display_product(pdlist, count);
+        break;
+
+    case 3:
+        search_product(pdlist, count);
+        break;
+    
+    case 4:
+        update_product(pdlist, count);
         break;
     
     default:
