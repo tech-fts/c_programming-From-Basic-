@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 struct Product {
     char id[20];
@@ -11,14 +12,25 @@ struct Product {
     int min_stock;
 };
 
+struct Sale {
+    char id[20];
+    char name[100];
+    float sale_price;
+    int quantity;
+    time_t sale_date;
+};
+
 int user_option(void) {
     int opt;
 
-    printf("0. Exit\n");
     printf("1. Add product\n");
     printf("2. Display product\n");
     printf("3. Search product\n");
     printf("4. Update product\n");
+    printf("5. Sell product\n");
+    printf("6. Low stock report\n");
+    printf("7. Inventory Statistics\n");
+    printf("0. Exit\n");
     printf("Enter your choice: ");
 
     scanf("%d", &opt);
@@ -26,6 +38,120 @@ int user_option(void) {
     return opt;
 }
 
+void display_time(time_t new_time)
+{
+    struct tm *local_time = localtime(&new_time);
+
+    if (local_time == NULL) {
+        printf("Invalid time");
+        return;
+    }
+
+    char date[30];
+
+    strftime(date, sizeof(date), "%d-%m-%Y %H:%M:%S", local_time);
+
+    printf("%s\n", date);
+}
+
+void stock_management(struct Sale **salelist, struct Product **pdlist){
+    if (salelist == NULL || *salelist == NULL) {
+        printf("No more products to sell!\n");
+        // struct Sale empty_sale = {0};
+        return;
+    }
+
+}
+
+
+struct Sale sale_product(
+    struct Sale **salelist,
+    struct Product **pdlist,
+    int *sale_count,
+    int *sale_capacity
+)
+{
+    struct Sale empty_sale = {0};
+
+    if (salelist == NULL || *salelist == NULL ||
+        sale_count == NULL || sale_capacity == NULL) {
+
+        printf("Invalid sales list!\n");
+        return empty_sale;
+    }
+
+    int count = *sale_count;
+
+    // Check capacity
+    if (count >= *sale_capacity) {
+
+        printf("Sales capacity is full!\n");
+
+        char sale_option;
+        int sale_new_capacity;
+
+        printf("Do you want to extend sales list? (y/n): ");
+        scanf(" %c", &sale_option);
+
+        if (sale_option == 'n' || sale_option == 'N') {
+            return empty_sale;
+        }
+
+        if (sale_option != 'y' && sale_option != 'Y') {
+            printf("Invalid option!\n");
+            return empty_sale;
+        }
+
+        printf("Enter additional capacity: ");
+        scanf("%d", &sale_new_capacity);
+
+        if (sale_new_capacity <= 0) {
+            printf("Invalid capacity!\n");
+            return empty_sale;
+        }
+
+        int new_total = *sale_capacity + sale_new_capacity;
+
+        struct Sale *temp = realloc(
+            *salelist,
+            new_total * sizeof(struct Sale)
+        );
+
+        if (temp == NULL) {
+            printf("Memory allocation failed!\n");
+            return empty_sale;
+        }
+
+        *salelist = temp;
+        *sale_capacity = new_total;
+    }
+
+    // Create sale
+    snprintf((*salelist)[count].id,
+             sizeof((*salelist)[count].id),
+             "S%03d", count + 1);
+
+    printf("Enter product name for sale: ");
+    scanf("%99s", (*salelist)[count].name);
+
+    printf("Enter sale price: ");
+    scanf("%f", &(*salelist)[count].sale_price);
+
+    printf("Enter quantity of product: ");
+    scanf("%d", &(*salelist)[count].quantity);
+
+    (*salelist)[count].sale_date = time(NULL);
+
+    struct Sale new_sale = (*salelist)[count];
+
+    (*sale_count)++;
+
+    printf("Sale successfully created!\n");
+
+    stock_management(salelist, pdlist);
+
+    return new_sale;
+}
 
 void update_product(struct Product **pdlist, int *count) {
 
@@ -206,6 +332,7 @@ void add_product(struct Product **pdlist, int *init_count, int *count){
             int new_capacity, total_capacity;
 
             printf("Do you want to add more? enter y/n : ");
+        
             scanf(" %c", &more_add);
             
             if (more_add == 'n' || more_add == 'N'){
@@ -303,28 +430,51 @@ void display_product(struct Product **pdlist, int *count)
     }
 }
 
-void user_action(int opt, struct Product **pdlist, int capacity, int *count)
+void user_action(
+    int opt,
+    struct Product **pdlist,
+    int *capacity,
+    int *count,
+    struct Sale **salelist,
+    int *sale_capacity,
+    int *sale_count
+)
 {
     switch (opt)
     {
-    case 1:
-        add_product(pdlist, &capacity, count);
-        break;
-    
-    case 2:
-        display_product(pdlist, count);
-        break;
+        case 1:
+            add_product(pdlist, capacity, count);
+            break;
 
-    case 3:
-        search_product(pdlist, count);
-        break;
-    
-    case 4:
-        update_product(pdlist, count);
-        break;
-    
-    default:
-        break;
+        case 2:
+            display_product(pdlist, count);
+            break;
+
+        case 3:
+            search_product(pdlist, count);
+            break;
+
+        case 4:
+            update_product(pdlist, count);
+            break;
+
+        case 5:
+        {
+            struct Sale new_sale = sale_product(
+                salelist,
+                pdlist,
+                sale_count,
+                sale_capacity
+            );
+
+            printf("Created sale: %s\n", new_sale.id);
+
+            break;
+        }
+
+        default:
+            printf("Invalid option!\n");
+            break;
     }
 }
 
@@ -335,7 +485,15 @@ int main(void)
 
     struct Product *pdlist = malloc(init_capacity * sizeof(struct Product));
 
+    int sale_capacity = 2, sale_count = 0;
+    struct Sale *salelist = malloc(sale_capacity * sizeof(struct Sale));
+
     if (pdlist == NULL) {
+        printf("Memory allocation failed!\n");
+        return 1;
+    }
+
+    if (salelist == NULL){
         printf("Memory allocation failed!\n");
         return 1;
     }
@@ -351,7 +509,15 @@ int main(void)
             break;
         }
 
-        user_action(useropt, &pdlist, init_capacity, &count);
+        user_action(
+            useropt,
+            &pdlist,
+            &init_capacity,
+            &count,
+            &salelist,
+            &sale_capacity,
+            &sale_count
+        );
     }
 
     free(pdlist);
