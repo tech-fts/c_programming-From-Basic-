@@ -4,7 +4,7 @@
 #include <time.h>
 
 struct Product {
-    char id[20];
+    char id[100];
     char name[100];
     char category[50];
     float unit_price;
@@ -13,7 +13,7 @@ struct Product {
 };
 
 struct Sale {
-    char id[20];
+    char id[100];
     char name[100];
     float sale_price;
     int quantity;
@@ -54,103 +54,103 @@ void display_time(time_t new_time)
     printf("%s\n", date);
 }
 
-void stock_management(struct Sale **salelist, struct Product **pdlist){
+void stock_management(struct Sale **salelist, struct Product **pdlist, int *sale_count){
     if (salelist == NULL || *salelist == NULL) {
         printf("No more products to sell!\n");
-        // struct Sale empty_sale = {0};
         return;
+    }
+
+    int found_sale = 0;
+
+    for(int i = 0; i < *sale_count; i++){
+        printf("%s", (*salelist)[i].id);
     }
 
 }
 
-
-struct Sale sale_product(
+void sale_product(
     struct Sale **salelist,
     struct Product **pdlist,
     int *sale_count,
     int *sale_capacity
 )
 {
-    struct Sale empty_sale = {0};
+    if (*sale_count == 0) {
 
-    if (salelist == NULL || *salelist == NULL ||
-        sale_count == NULL || sale_capacity == NULL) {
-
-        printf("Invalid sales list!\n");
-        return empty_sale;
+        printf("Invalid sales list to sell!\n");
+        return;
     }
 
-    int count = *sale_count;
+    while(1){
+        int count = *sale_count;
 
-    // Check capacity
-    if (count >= *sale_capacity) {
+        // Check capacity
+        if (count >= *sale_capacity) {
 
-        printf("Sales capacity is full!\n");
+            printf("Sales capacity is full!\n");
 
-        char sale_option;
-        int sale_new_capacity;
+            char sale_option;
+            int sale_new_capacity;
 
-        printf("Do you want to extend sales list? (y/n): ");
-        scanf(" %c", &sale_option);
+            printf("Do you want to extend sales list? (y/n): ");
+            scanf(" %c", &sale_option);
 
-        if (sale_option == 'n' || sale_option == 'N') {
-            return empty_sale;
+            if (sale_option == 'n' || sale_option == 'N') {
+                return;
+            }
+
+            if (sale_option != 'y' && sale_option != 'Y') {
+                printf("Invalid option!\n");
+                return;
+            }
+
+            printf("Enter additional capacity: ");
+            scanf("%d", &sale_new_capacity);
+
+            if (sale_new_capacity <= 0) {
+                printf("Invalid capacity!\n");
+                return;
+            }
+
+            int new_total = *sale_capacity + sale_new_capacity;
+
+            struct Sale *temp = realloc(
+                *salelist,
+                new_total * sizeof(struct Sale)
+            );
+
+            if (temp == NULL) {
+                printf("Memory allocation failed!\n");
+                return;
+            }
+
+            *salelist = temp;
+            *sale_capacity = new_total;
         }
 
-        if (sale_option != 'y' && sale_option != 'Y') {
-            printf("Invalid option!\n");
-            return empty_sale;
-        }
+        // Create sale
+        snprintf((*salelist)[count].id,
+                sizeof((*salelist)[count].id),
+                "S%03d", count + 1);
 
-        printf("Enter additional capacity: ");
-        scanf("%d", &sale_new_capacity);
+        printf("Enter product name for sale: ");
+        scanf("%99s", (*salelist)[count].name);
 
-        if (sale_new_capacity <= 0) {
-            printf("Invalid capacity!\n");
-            return empty_sale;
-        }
+        printf("Enter sale price: ");
+        scanf("%f", &(*salelist)[count].sale_price);
 
-        int new_total = *sale_capacity + sale_new_capacity;
+        printf("Enter quantity of product: ");
+        scanf("%d", &(*salelist)[count].quantity);
 
-        struct Sale *temp = realloc(
-            *salelist,
-            new_total * sizeof(struct Sale)
-        );
+        (*salelist)[count].sale_date = time(NULL);
 
-        if (temp == NULL) {
-            printf("Memory allocation failed!\n");
-            return empty_sale;
-        }
+        struct Sale new_sale = (*salelist)[count];
 
-        *salelist = temp;
-        *sale_capacity = new_total;
+        (*sale_count)++;
+
+        printf("Sale successfully created!\n");
+        stock_management(salelist, pdlist, sale_count);
     }
-
-    // Create sale
-    snprintf((*salelist)[count].id,
-             sizeof((*salelist)[count].id),
-             "S%03d", count + 1);
-
-    printf("Enter product name for sale: ");
-    scanf("%99s", (*salelist)[count].name);
-
-    printf("Enter sale price: ");
-    scanf("%f", &(*salelist)[count].sale_price);
-
-    printf("Enter quantity of product: ");
-    scanf("%d", &(*salelist)[count].quantity);
-
-    (*salelist)[count].sale_date = time(NULL);
-
-    struct Sale new_sale = (*salelist)[count];
-
-    (*sale_count)++;
-
-    printf("Sale successfully created!\n");
-
-    stock_management(salelist, pdlist);
-
-    return new_sale;
 }
 
 void update_product(struct Product **pdlist, int *count) {
@@ -319,7 +319,7 @@ int create_category(struct Product **pdlist, int *count, char *current_category)
     }
 }
 
-void add_product(struct Product **pdlist, int *init_count, int *count){
+int add_product(struct Product **pdlist, int *init_count, int *count){
     printf("\n\n ====== Adding Product List ======\n\n");
     int same_category = 0, sameCategoryCount = 0;
     char current_category[50] = "";
@@ -337,7 +337,7 @@ void add_product(struct Product **pdlist, int *init_count, int *count){
             
             if (more_add == 'n' || more_add == 'N'){
                 printf("no more product add...\n");
-                return;
+                return 1;
             }
 
             printf("Enter new capacity: ");
@@ -356,7 +356,7 @@ void add_product(struct Product **pdlist, int *init_count, int *count){
 
             if (temp == NULL) {
                 printf("Memory reallocation failed!\n");
-                return;
+                return 1;
             }
 
             *pdlist = temp;
@@ -404,6 +404,7 @@ void add_product(struct Product **pdlist, int *init_count, int *count){
 
         printf("Product added successfully!\n");
     }
+    return *init_count;
 }
 
 void display_product(struct Product **pdlist, int *count)
@@ -443,7 +444,7 @@ void user_action(
     switch (opt)
     {
         case 1:
-            add_product(pdlist, capacity, count);
+            *sale_count = add_product(pdlist, capacity, count);
             break;
 
         case 2:
@@ -460,15 +461,7 @@ void user_action(
 
         case 5:
         {
-            struct Sale new_sale = sale_product(
-                salelist,
-                pdlist,
-                sale_count,
-                sale_capacity
-            );
-
-            printf("Created sale: %s\n", new_sale.id);
-
+            sale_product(salelist,pdlist,sale_count,sale_capacity);
             break;
         }
 
@@ -485,7 +478,7 @@ int main(void)
 
     struct Product *pdlist = malloc(init_capacity * sizeof(struct Product));
 
-    int sale_capacity = 2, sale_count = 0;
+    int sale_capacity = 2, sale_count;
     struct Sale *salelist = malloc(sale_capacity * sizeof(struct Sale));
 
     if (pdlist == NULL) {
