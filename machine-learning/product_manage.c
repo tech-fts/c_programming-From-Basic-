@@ -20,6 +20,16 @@ struct Sale {
     time_t sale_date;
 };
 
+
+void file_writing(struct Sale **salelist){
+    FILE *fptr = fopen("sale.csv", "a");
+
+    if(fptr = NULL){
+        printf("cannot open csv file!!!");
+        return;
+    }
+}
+
 int user_option(void) {
     int opt;
 
@@ -28,8 +38,7 @@ int user_option(void) {
     printf("3. Search product\n");
     printf("4. Update product\n");
     printf("5. Sell product\n");
-    printf("6. Low stock report\n");
-    printf("7. Inventory Statistics\n");
+    printf("6. Inventory Statistics\n");
     printf("0. Exit\n");
     printf("Enter your choice: ");
 
@@ -64,13 +73,15 @@ void stock_management(struct Sale **salelist,struct Product **pdlist,int *pd_cou
     int new_stock;
 
     for (int i = 0; i < *sale_count; i++) {
-        printf("Sale Name: %s\n", (*salelist)[i].name);
         for(int j=0; j< *pd_count; j++){
-            if(strcmp((*salelist)[i].name,(*pdlist)[j].name)){
-                printf("product stock is %d and sale stock is %d",(*pdlist)[j].stock ,(*salelist)[i].quantity);
+            if (strcmp((*salelist)[i].name, (*pdlist)[j].name) == 0){
+                printf("product stock is %d and sale stock is %d\n",(*pdlist)[j].stock ,(*salelist)[i].quantity);
                 new_stock = (*pdlist)[j].stock - (*salelist)[i].quantity;
-                (*pdlist)[i].stock = new_stock;
-                printf("new stock for product list is %d",(*pdlist)[i].stock);
+                (*pdlist)[j].stock = new_stock;
+                printf("new stock for product list is %d\n",(*pdlist)[j].stock);
+            }
+            if((*pdlist)[j].stock < (*pdlist)[j].min_stock){
+                printf("Low stock alert!!!! for %99s", (*pdlist)[j].name);
             }
         }
     }
@@ -155,7 +166,14 @@ void sale_product(struct Sale **salelist,struct Product **pdlist, int *pd_count,
         return;
     }
 
+    if((*salelist)[count].quantity == 0){
+        printf("no more product to sale!!!");
+        return;
+    }
+
     (*salelist)[count].sale_date = time(NULL);
+
+    file_writing(salelist);
 
     (*sale_count)++;
 
@@ -439,6 +457,10 @@ void display_product(struct Product **pdlist, int *count)
                (*pdlist)[i].unit_price,
                (*pdlist)[i].stock,
                (*pdlist)[i].min_stock);
+        
+        if((*pdlist)[i].stock < (*pdlist)[i].min_stock){
+                printf("Low stock alert!!!! for %99s\n", (*pdlist)[i].name);
+        }
     }
 }
 
@@ -471,10 +493,8 @@ void user_action(
             break;
 
         case 5:
-        {
             sale_product(salelist,pdlist,count,sale_count,sale_capacity);
             break;
-        }
 
         default:
             printf("Invalid option!\n");
