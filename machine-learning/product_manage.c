@@ -20,14 +20,24 @@ struct Sale {
     time_t sale_date;
 };
 
-
-void file_writing(struct Sale **salelist){
+void file_writing(struct Sale **salelist, int *sale_count){
     FILE *fptr = fopen("sale.csv", "a");
 
-    if(fptr = NULL){
+    if(fptr == NULL){
         printf("cannot open csv file!!!");
         return;
     }
+
+    fprintf(fptr, "id,name,sape_price,quantity\n");
+
+    for ( int i = 0; i < *sale_count; i++){
+        fprintf(fptr, "%s,%s,%.2f,%d\n",
+        (*salelist)[i].id,
+        (*salelist)[i].name,
+        (*salelist)[i].sale_price,
+        (*salelist)[i].quantity);
+    }
+    fclose(fptr);
 }
 
 int user_option(void) {
@@ -173,9 +183,9 @@ void sale_product(struct Sale **salelist,struct Product **pdlist, int *pd_count,
 
     (*salelist)[count].sale_date = time(NULL);
 
-    file_writing(salelist);
-
     (*sale_count)++;
+
+    file_writing(salelist, sale_count);
 
     printf("Sale successfully created!\n");
 
