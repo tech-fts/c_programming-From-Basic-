@@ -30,19 +30,34 @@ void inventory_static(struct Product **pdlist,int *pd_count,struct Sale **saleli
 
     int total_product = 0;
     float total_inv_amount;
-    for (int i = 0; i < *pd_count; i++ ){
-        total_product += (*pdlist)[i].stock;
-        total_inv_amount += (*pdlist)[i].unit_price;
+    for (int a = 0; a < *pd_count; a++ ){
+        total_product += (*pdlist)[a].stock;
+        total_inv_amount += (*pdlist)[a].unit_price;
 
-        if((*pdlist)[i].stock < (*pdlist)[i].min_stock){
-            printf("%s is low stock", (*pdlist)[i].name);
+        printf("\n====== Inventory ======\n");
+        printf("Total Product is %d\n", total_product);
+        printf("Total Amount of product is %f\n", total_inv_amount);
+
+        if((*pdlist)[a].stock < (*pdlist)[a].min_stock){
+            printf("%s is low stock.\n", (*pdlist)[a].name);
         }
+    }
+
+    int total_sale = 0;
+    float total_sale_amount;
+    for (int j = 0; j < *sale_count; j++ ){
+        total_sale += (*salelist)[j].quantity;
+        total_sale_amount += (*salelist)[j].sale_price;
+
+        printf("\n====== Inventory ======\n");
+        printf("Total Sale is %d\n", total_sale);
+        printf("Total Amount of Sale Amount is %f\n", total_sale_amount);
     }
 }
 
 void file_writing(struct Sale **salelist){
     FILE *fptr = fopen("sale.csv", "a");
-
+    int i=1;
     if(fptr == NULL){
         printf("cannot open csv file!!!");
         return;
@@ -60,6 +75,7 @@ void file_writing(struct Sale **salelist){
     (*salelist)[i].sale_price,
     (*salelist)[i].quantity,
     (*salelist)[i].sale_date);
+    i++;
 
     fclose(fptr);
 }
