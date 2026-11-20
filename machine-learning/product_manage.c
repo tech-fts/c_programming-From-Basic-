@@ -17,10 +17,30 @@ struct Sale {
     char name[100];
     float sale_price;
     int quantity;
-    time_t sale_date;
+    char sale_date[100];
 };
 
-void file_writing(struct Sale **salelist, int *sale_count){
+char date[30];
+
+void inventory_static(struct Product **pdlist,int *pd_count,struct Sale **salelist,int *sale_count){
+    if(*pd_count == 0 || *sale_count == 0){
+        printf("Invalid inventory ");
+        return;
+    }
+
+    int total_product = 0;
+    float total_inv_amount;
+    for (int i = 0; i < *pd_count; i++ ){
+        total_product += (*pdlist)[i].stock;
+        total_inv_amount += (*pdlist)[i].unit_price;
+
+        if((*pdlist)[i].stock < (*pdlist)[i].min_stock){
+            printf("%s is low stock", (*pdlist)[i].name);
+        }
+    }
+}
+
+void file_writing(struct Sale **salelist){
     FILE *fptr = fopen("sale.csv", "a");
 
     if(fptr == NULL){
@@ -28,15 +48,19 @@ void file_writing(struct Sale **salelist, int *sale_count){
         return;
     }
 
-    fprintf(fptr, "id,name,sape_price,quantity\n");
+    fseek(fptr, 0, SEEK_END); //checking file is empty
 
-    for ( int i = 0; i < *sale_count; i++){
-        fprintf(fptr, "%s,%s,%.2f,%d\n",
-        (*salelist)[i].id,
-        (*salelist)[i].name,
-        (*salelist)[i].sale_price,
-        (*salelist)[i].quantity);
+    if (ftell(fptr) == 0) {
+        fprintf(fptr, "id,name,sale_price,quantity,sale_date\n");
     }
+
+    fprintf(fptr, "%s,%s,%.2f,%d,%s\n",
+    (*salelist)[i].id,
+    (*salelist)[i].name,
+    (*salelist)[i].sale_price,
+    (*salelist)[i].quantity,
+    (*salelist)[i].sale_date);
+
     fclose(fptr);
 }
 
@@ -57,20 +81,20 @@ int user_option(void) {
     return opt;
 }
 
-void display_time(time_t new_time)
+void display_time(time_t new_time, char *date, size_t size)
 {
     struct tm *local_time = localtime(&new_time);
 
     if (local_time == NULL) {
-        printf("Invalid time");
+        printf("Invalid time!\n");
         return;
     }
 
-    char date[30];
-
-    strftime(date, sizeof(date), "%d-%m-%Y %H:%M:%S", local_time);
-
-    printf("%s\n", date);
+    if (strftime(date, size, "%d-%m-%Y %H:%M:%S",
+                 local_time) == 0) {
+        printf("Date formatting failed!\n");
+        return;
+    }
 }
 
 void stock_management(struct Sale **salelist,struct Product **pdlist,int *pd_count,int *sale_count)
@@ -181,11 +205,15 @@ void sale_product(struct Sale **salelist,struct Product **pdlist, int *pd_count,
         return;
     }
 
-    (*salelist)[count].sale_date = time(NULL);
+    time_t current_time = time(NULL);
+
+    display_time(current_time,(*salelist)[count].sale_date,
+        sizeof((*salelist)[count].sale_date)
+    );
 
     (*sale_count)++;
 
-    file_writing(salelist, sale_count);
+    file_writing(salelist);
 
     printf("Sale successfully created!\n");
 
@@ -504,6 +532,10 @@ void user_action(
 
         case 5:
             sale_product(salelist,pdlist,count,sale_count,sale_capacity);
+            break;
+        
+        case 6:
+            inventory_static(pdlist,count,salelist,sale_count);
             break;
 
         default:
