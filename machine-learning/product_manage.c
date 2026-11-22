@@ -29,10 +29,10 @@ void inventory_static(struct Product **pdlist,int *pd_count,struct Sale **saleli
     }
 
     int total_product = 0;
-    float total_inv_amount;
+    float total_inv_amount = 0.0f;
     for (int a = 0; a < *pd_count; a++ ){
         total_product += (*pdlist)[a].stock;
-        total_inv_amount += (*pdlist)[a].unit_price;
+        total_inv_amount += (*pdlist)[a].unit_price * (*pdlist)[a].stock;
 
         printf("\n====== Inventory ======\n");
         printf("Total Product is %d\n", total_product);
@@ -43,16 +43,21 @@ void inventory_static(struct Product **pdlist,int *pd_count,struct Sale **saleli
         }
     }
 
-    int total_sale = 0;
-    float total_sale_amount;
-    for (int j = 0; j < *sale_count; j++ ){
-        total_sale += (*salelist)[j].quantity;
-        total_sale_amount += (*salelist)[j].sale_price;
+    int total_sold = 0;
+    float total_revenue = 0.0f;
 
-        printf("\n====== Inventory ======\n");
-        printf("Total Sale is %d\n", total_sale);
-        printf("Total Amount of Sale Amount is %f\n", total_sale_amount);
+    for (int j = 0; j < *sale_count; j++) {
+
+        total_sold += (*salelist)[j].quantity;
+
+        total_revenue +=
+            (*salelist)[j].sale_price * (*salelist)[j].quantity;
     }
+
+    printf("\n====== Sales Statistics ======\n");
+    printf("Total sales transactions: %d\n", *sale_count);
+    printf("Total items sold: %d\n", total_sold);
+    printf("Total sales revenue: %.2f\n", total_revenue);
 }
 
 void file_writing(struct Sale **salelist){
@@ -69,13 +74,15 @@ void file_writing(struct Sale **salelist){
         fprintf(fptr, "id,name,sale_price,quantity,sale_date\n");
     }
 
-    fprintf(fptr, "%s,%s,%.2f,%d,%s\n",
-    (*salelist)[i].id,
-    (*salelist)[i].name,
-    (*salelist)[i].sale_price,
-    (*salelist)[i].quantity,
-    (*salelist)[i].sale_date);
-    i++;
+    while(i < 0){
+        fprintf(fptr, "%s,%s,%.2f,%d,%s\n",
+        (*salelist)[i].id,
+        (*salelist)[i].name,
+        (*salelist)[i].sale_price,
+        (*salelist)[i].quantity,
+        (*salelist)[i].sale_date);
+        i++;
+    }
 
     fclose(fptr);
 }
