@@ -7,6 +7,12 @@ struct Member {
     char phone[20];
     char email[100];
     char address[200];
+    int borrowed_books_count;
 };
+
+void addMember(struct Member* members, int* count, int capacity);
+void viewMembers(struct Member* members, int count);
+void updateMember(struct Member* members, int count);
+void deleteMember(struct Member* members, int* count);
 
 #endif

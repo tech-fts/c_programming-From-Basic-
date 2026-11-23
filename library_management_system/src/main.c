@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "modules/book/book.h"
+#include "modules/member/member.h"
 
 void book_management(void);
 void member_management(void);
@@ -83,6 +84,49 @@ void book_management(void) {
 }
 
 void member_management(void) {
+    int initial_capacity = 100; // Initial capacity for the member list
+    struct Member* memberlist = malloc(sizeof(struct Member) * initial_capacity);
+    int member_count = 0;
+
+    if(memberlist == NULL) {
+        fprintf(stderr, "Memory allocation failed!\n");
+        return;
+    }
+
+    int choice;
+    do
+    {
+        printf("\nMember Management Menu:\n");
+        printf("1. Add a Member\n");
+        printf("2. View Members\n");
+        printf("3. Update Member Information\n");
+        printf("4. Delete a Member\n");
+        printf("0. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                addMember(memberlist, &member_count, initial_capacity);
+                break;
+            case 2:
+                viewMembers(memberlist, member_count);
+                break;
+            case 3:
+                updateMember(memberlist, member_count);
+                break;
+            case 4:
+                deleteMember(memberlist, &member_count);
+                break;
+            case 0:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+        /* code */
+    } while (choice != 0);
+    
     // Code for member management
     printf("Member management functionality is not implemented yet.\n");
 }

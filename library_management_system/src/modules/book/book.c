@@ -1,6 +1,5 @@
 #include <stdio.h>
 #include <string.h>
-#include <stdlib.h>
 #include "book.h"
 
 void addBook(struct Book* books, int* count) {
