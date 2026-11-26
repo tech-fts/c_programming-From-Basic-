@@ -2,9 +2,11 @@
 #include <stdlib.h>
 #include "modules/book/book.h"
 #include "modules/member/member.h"
+#include "modules/borrowing/borrowing.h"
 
 void book_management(void);
 void member_management(void);
+void borrowing_management(void);
 
 int main(void){
     printf("Welcome to the Library Management System!\n");
@@ -14,6 +16,7 @@ int main(void){
         printf("\nMain Menu:\n");
         printf("1. Book Management\n");
         printf("2. Member Management\n");
+        printf("3. Borrowing Management\n");
         printf("0. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &main_choice);
@@ -25,6 +28,10 @@ int main(void){
             case 2:
                 // Code for member management
                 member_management();
+                break;
+            case 3:
+                // Code for borrowing management
+                borrowing_management();
                 break;
             case 0:
                 printf("Exiting the program.\n");
@@ -129,4 +136,49 @@ void member_management(void) {
     
     // Code for member management
     printf("Member management functionality is not implemented yet.\n");
+}
+
+void borrowing_management(void) {
+    // Code for borrowing management
+    int initial_capacity = 100; // Initial capacity for the borrowing list
+    struct BorrowID* borrowlist = malloc(sizeof(struct BorrowID) * initial_capacity);
+    int borrow_count = 0;
+
+    if(borrowlist == NULL) {
+        fprintf(stderr, "Memory allocation failed!\n");
+        return;
+    }
+
+    int choice;
+    do {
+        printf("\nBorrowing Management Menu:\n");
+        printf("1. Borrow a Book\n");
+        printf("2. Return a Book\n");
+        printf("3. View Borrowed Books\n");
+        printf("0. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        switch (choice) {
+            case 1:
+                // Code to borrow a book
+                create_borrow(borrowlist, &borrow_count, initial_capacity);
+                printf("Borrowing a book...\n");
+                break;
+            case 2:
+                // Code to return a book
+                printf("Returning a book...\n");
+                break;
+            case 3:
+                // Code to view borrowed books
+                printf("Viewing borrowed books...\n");
+                break;
+            case 0:
+                printf("Exiting the program.\n");
+                break;
+            default:
+                printf("Invalid choice. Please try again.\n");
+        }
+    } while (choice != 0);
+    printf("Borrowing management functionality is not implemented yet.\n");
 }
