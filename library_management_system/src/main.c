@@ -1,8 +1,9 @@
 #include <stdio.h>
-#include <stdlib.h>
-#include "modules/book/book.h"
-#include "modules/member/member.h"
-#include "modules/borrowing/borrowing.h"
+#include "core/memory.h"
+#include "book.h"
+#include "member.h"
+#include "borrowing.h"
+#include "utils/input.h"
 
 void book_management(void);
 void member_management(void);
@@ -11,15 +12,25 @@ void borrowing_management(void);
 int main(void){
     printf("Welcome to the Library Management System!\n");
 
-    int main_choice;
-    do {
+    for (;;) {
         printf("\nMain Menu:\n");
         printf("1. Book Management\n");
         printf("2. Member Management\n");
         printf("3. Borrowing Management\n");
         printf("0. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &main_choice);
+        int main_choice;
+        InputResult input_result = input_read_int("Enter your choice: ", 0, 3, &main_choice);
+
+        if (input_result == INPUT_EOF) {
+            printf("\nInput ended. Exiting the program.\n");
+            break;
+        }
+        if (input_result == INPUT_ERROR) {
+            return 1;
+        }
+        if (input_result == INPUT_INVALID) {
+            continue;
+        }
 
         switch (main_choice) {
             case 1:
@@ -35,21 +46,19 @@ int main(void){
                 break;
             case 0:
                 printf("Exiting the program.\n");
-                break;
-            default:
-                printf("Invalid choice. Please try again.\n");
+                return 0;
         }
-    } while (main_choice != 0 && main_choice != 1);
+    }
+
     return 0;
 }
 
 void book_management(void) {
     int initial_capacity = 100; // Initial capacity for the book list
-    struct Book* booklist = malloc(sizeof(struct Book) * initial_capacity);
+    struct Book* booklist = memory_allocate_zeroed((size_t)initial_capacity, sizeof *booklist);
     int book_count = 0;
 
     if(booklist == NULL) {
-        fprintf(stderr, "Memory allocation failed!\n");
         return;
     }
 
@@ -88,15 +97,16 @@ void book_management(void) {
                 printf("Invalid choice. Please try again.\n");
         }
     } while (choice != 0);
+
+    memory_release(booklist);
 }
 
 void member_management(void) {
     int initial_capacity = 100; // Initial capacity for the member list
-    struct Member* memberlist = malloc(sizeof(struct Member) * initial_capacity);
+    struct Member* memberlist = memory_allocate_zeroed((size_t)initial_capacity, sizeof *memberlist);
     int member_count = 0;
 
     if(memberlist == NULL) {
-        fprintf(stderr, "Memory allocation failed!\n");
         return;
     }
 
@@ -136,16 +146,16 @@ void member_management(void) {
     
     // Code for member management
     printf("Member management functionality is not implemented yet.\n");
+    memory_release(memberlist);
 }
 
 void borrowing_management(void) {
     // Code for borrowing management
     int initial_capacity = 100; // Initial capacity for the borrowing list
-    struct BorrowID* borrowlist = malloc(sizeof(struct BorrowID) * initial_capacity);
+    struct BorrowID* borrowlist = memory_allocate_zeroed((size_t)initial_capacity, sizeof *borrowlist);
     int borrow_count = 0;
 
     if(borrowlist == NULL) {
-        fprintf(stderr, "Memory allocation failed!\n");
         return;
     }
 
@@ -155,6 +165,7 @@ void borrowing_management(void) {
         printf("1. Borrow a Book\n");
         printf("2. Return a Book\n");
         printf("3. View Borrowed Books\n");
+        printf("4. delete Borrowing Record\n");
         printf("0. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
@@ -167,11 +178,19 @@ void borrowing_management(void) {
                 break;
             case 2:
                 // Code to return a book
+                update_borrow(borrowlist, &borrow_count);
                 printf("Returning a book...\n");
                 break;
             case 3:
                 // Code to view borrowed books
+                view_borrow(borrowlist, &borrow_count);
                 printf("Viewing borrowed books...\n");
+                break;
+            
+            case 4:
+                // Code to delete a borrowing record
+                delete_borrow(borrowlist, &borrow_count);
+                printf("Deleting a borrowing record...\n");
                 break;
             case 0:
                 printf("Exiting the program.\n");
@@ -181,4 +200,5 @@ void borrowing_management(void) {
         }
     } while (choice != 0);
     printf("Borrowing management functionality is not implemented yet.\n");
+    memory_release(borrowlist);
 }

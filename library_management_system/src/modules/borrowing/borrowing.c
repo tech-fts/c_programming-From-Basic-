@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "borrowing.h"
 
 void create_borrow(struct BorrowID* borrowings, int* count, int capacity) {
@@ -36,6 +37,18 @@ void create_borrow(struct BorrowID* borrowings, int* count, int capacity) {
         printf("Enter book ID: ");
         if (scanf(" %99[^\n]", borrowing->book_id) != 1) {
             printf("Could not read the book ID.\n");
+            return;
+        }
+
+        printf("Enter address: ");
+        if (scanf(" %199[^\n]", borrowing->address) != 1) {
+            printf("Could not read the address.\n");
+            return;
+        }
+
+        printf("Enter status: ");
+        if (scanf(" %99[^\n]", borrowing->status) != 1) {
+            printf("Could not read the status.\n");
             return;
         }
 
