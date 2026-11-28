@@ -4,6 +4,9 @@
 #include "member.h"
 #include "borrowing.h"
 #include "utils/input.h"
+#include "storage/csv_reader.h"
+#include "storage/csv_writer.h"
+#include "modules/reports/reports.h"
 
 void book_management(void);
 void member_management(void);
@@ -110,6 +113,8 @@ void member_management(void) {
         return;
     }
 
+    read_members_from_csv(memberlist, &member_count, initial_capacity, "data/members.csv");
+
     int choice;
     do
     {
@@ -146,6 +151,7 @@ void member_management(void) {
     
     // Code for member management
     printf("Member management functionality is not implemented yet.\n");
+    write_members_to_csv(memberlist, member_count, "data/members.csv");
     memory_release(memberlist);
 }
 
@@ -159,13 +165,16 @@ void borrowing_management(void) {
         return;
     }
 
+    read_borrows_from_csv(borrowlist, &borrow_count, initial_capacity, "data/borrowings.csv");
+
     int choice;
     do {
         printf("\nBorrowing Management Menu:\n");
         printf("1. Borrow a Book\n");
         printf("2. Return a Book\n");
         printf("3. View Borrowed Books\n");
-        printf("4. delete Borrowing Record\n");
+        printf("4. Delete Borrowing Record\n");
+        printf("5. Print Borrowing Report\n");
         printf("0. Exit\n");
         printf("Enter your choice: ");
         scanf("%d", &choice);
@@ -192,6 +201,9 @@ void borrowing_management(void) {
                 delete_borrow(borrowlist, &borrow_count);
                 printf("Deleting a borrowing record...\n");
                 break;
+            case 5:
+                print_borrowing_report(borrowlist, borrow_count);
+                break;
             case 0:
                 printf("Exiting the program.\n");
                 break;
@@ -200,5 +212,6 @@ void borrowing_management(void) {
         }
     } while (choice != 0);
     printf("Borrowing management functionality is not implemented yet.\n");
+    write_borrows_to_csv(borrowlist, borrow_count, "data/borrowings.csv");
     memory_release(borrowlist);
 }
